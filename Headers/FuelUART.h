@@ -26,6 +26,7 @@ bool PostFuelUART(ES_Event_t ThisEvent);
 ES_Event_t RunFuelUART(ES_Event_t ThisEvent);
 FuelUARTState_t QueryFuelUART(void);
 
+bool InitializeUART (void);
 void UART_ISR ( void );     // UART1 interrupt service routine 
 
 #endif /* FuelUART_H */

@@ -153,16 +153,18 @@ ES_Event_t RunFuelUART(ES_Event_t ThisEvent)
   //printf("\n\rRun Fuel UART.");
   
   switch (ThisEvent.EventType){
+    case ES_INIT:
+      // Initialize UART TX & RX Interrupts: Pages 924 and 925  		
+      HWREG(UART1_BASE + UART_O_IM) |= UART_IM_TXIM;  
+      //HWREG(UART1_BASE + UART_O_IM) |= UART_IM_RXIM;
+      break;
     case ES_FUEL_QUERY:  //If event is event one
-      //HWREG(UART1_BASE + UART_O_DR) = (HWREG(UART1_BASE + UART_O_DR) & 0xffffff00) + 0xAA;
-      printf("\n\rTX to Fuel Gauge: 0x%x", FUEL_QUERY);
       // If TXFE is set there is room to transfer a byte as the fifo as diabled (See Pages 911 and 912 of DataSheet)
       if ( HWREG(UART1_BASE + UART_O_FR) & UART_FR_TXFE ) {
-        //HWREG(UART1_BASE + UART_O_DR) = FUEL_QUERY;
-        //HWREG(UART1_BASE + UART_O_IM) |= UART_IM_TXIM;    // enable transmit interrupts
-        //HWREG(UART1_BASE + UART_O_DR) = (HWREG(UART1_BASE + UART_O_DR) & 0xffffff00) + 0xAA;
+        HWREG(UART1_BASE + UART_O_DR) = (HWREG(UART1_BASE + UART_O_DR) & 0xffffff00) + FUEL_QUERY;
+        printf("\n\rTX to Fuel Gauge: 0x%x", FUEL_QUERY);
       }
-      else printf("\n\rERROR: no space in UART1");
+      else printf("\n\rTX to Fuel Gauge: ERROR, no space in UART1");
       
       break;
     
@@ -177,9 +179,14 @@ ES_Event_t RunFuelUART(ES_Event_t ThisEvent)
     case ES_BAD_FUEL_QUERY:
       printf("\n\rBAD Fuel Query Key Received.");
       break;
+    
+    case ES_TRANSMIT_COMPLETE:
+      printf("\n\rUART 1 Transmit Complete");
+      break;
    
     default:
-      printf("\n\rUnhandled event in RunFuelUART.");
+      printf("\n\rUnhandled event in RunFuelUART with enum %d and parameter %d", 
+          ThisEvent.EventType, ThisEvent.EventParam);
   }
 
                                 // end switch on Current State
@@ -273,13 +280,9 @@ bool InitializeUART (void){
 	
 		// Enable the UART by setting the UARTEN bit in the UARTCTL register
 		HWREG(UART1_BASE + UART_O_CTL) |= (UART_CTL_UARTEN);
-		
-					
-		// Initialize UART TX Interrupt: Pages 924 and 925
-		HWREG(UART1_BASE + UART_O_IM) |= UART_IM_TXIM;
-			
-		// Initialize UART RX Interrupt: Pages 924 and 925
-		HWREG(UART1_BASE + UART_O_IM) |= UART_IM_RXIM;
+    
+    // Enable the UART by setting the UARTEN bit in the UARTCTL register
+		HWREG(UART1_BASE + UART_O_CTL) |= (UART_CTL_LBE);
 			
 		//Enable nvi
 		HWREG(NVIC_EN0) |= BIT6HI;

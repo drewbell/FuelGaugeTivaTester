@@ -37,6 +37,18 @@
 // include our own prototypes to insure consistency between header &
 // actual functionsdefinition
 #include "EventCheckers.h"
+// other includes needed
+#include "driverlib/sysctl.h"
+#include "driverlib/pin_map.h"	// Define PART_TM4C123GH6PM in project
+#include "driverlib/gpio.h"
+#include "inc/hw_pwm.h"
+#include "inc/hw_timer.h"
+#include "inc/hw_nvic.h"
+#include "inc/hw_uart.h"
+#include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
+#include "inc/hw_gpio.h"
+#include "inc/hw_sysctl.h"
 
 // This is the event checking function sample. It is not intended to be
 // included in the module. It is only here as a sample to guide you in writing
@@ -130,6 +142,24 @@ bool Check4Keystroke(void)
       QueryEvent.EventType = ES_BAD_FUEL_QUERY;
       PostFuelUART(QueryEvent);
     }
+    else if(ThisEvent.EventParam == 'l')
+    {
+      printf("\n\rUART1 Loopback Mode and RX <Enabled>");
+      HWREG(UART1_BASE + UART_O_IM) |= UART_IM_RXIM;
+      HWREG(UART1_BASE + UART_O_CTL) |= UART_CTL_LBE;
+      
+    }
+    else if(ThisEvent.EventParam == 'n')
+    {
+      printf("\n\rUART1 Loopback Mode and RX <Disabled>");
+      HWREG(UART1_BASE + UART_O_IM) &= ~UART_IM_RXIM;
+      HWREG(UART1_BASE + UART_O_CTL) &= ~UART_CTL_LBE;
+    }
+    
+    
+        // Enable the UART by setting the UARTEN bit in the UARTCTL register
+		HWREG(UART1_BASE + UART_O_CTL) |= (UART_CTL_LBE);
+    
 
     return true;
   }
