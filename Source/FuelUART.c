@@ -156,7 +156,7 @@ ES_Event_t RunFuelUART(ES_Event_t ThisEvent)
     case ES_INIT:
       // Initialize UART TX & RX Interrupts: Pages 924 and 925  		
       HWREG(UART1_BASE + UART_O_IM) |= UART_IM_TXIM;  
-      //HWREG(UART1_BASE + UART_O_IM) |= UART_IM_RXIM;
+      HWREG(UART1_BASE + UART_O_IM) |= UART_IM_RXIM;
       break;
     case ES_FUEL_QUERY:  //If event is event one
       // If TXFE is set there is room to transfer a byte as the fifo as diabled (See Pages 911 and 912 of DataSheet)
@@ -182,7 +182,7 @@ ES_Event_t RunFuelUART(ES_Event_t ThisEvent)
     
     case ES_TRANSMIT_COMPLETE:
       printf("\n\rUART 1 Transmit Complete");
-      break;
+      break; 
    
     default:
       printf("\n\rUnhandled event in RunFuelUART with enum %d and parameter %d", 
