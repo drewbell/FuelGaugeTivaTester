@@ -117,10 +117,20 @@ bool Check4Keystroke(void)
     {
       ES_PostList00(ThisEvent);
     }
-    else     // otherwise post to Service 0 for processing
+    else if(ThisEvent.EventParam == 'q')
     {
-      PostTestHarnessService0(ThisEvent);
+      ES_Event_t QueryEvent;
+      QueryEvent.EventType = ES_FUEL_QUERY;
+      PostFuelUART(QueryEvent);
+      printf("\n\rKeystroke < q > FuelQuery ");
     }
+    else if(ThisEvent.EventParam == 'b')
+    {
+      ES_Event_t QueryEvent;
+      QueryEvent.EventType = ES_BAD_FUEL_QUERY;
+      PostFuelUART(QueryEvent);
+    }
+
     return true;
   }
   return false;

@@ -41,11 +41,11 @@
 // services are added in numeric sequence (1,2,3,...) with increasing
 // priorities
 // the header file with the public function prototypes
-#define SERV_0_HEADER "TestHarnessService0.h"
+#define SERV_0_HEADER "FuelUART.h"
 // the name of the Init function
-#define SERV_0_INIT InitTestHarnessService0
+#define SERV_0_INIT InitFuelUART
 // the name of the run function
-#define SERV_0_RUN RunTestHarnessService0
+#define SERV_0_RUN RunFuelUART
 // How big should this services Queue be?
 #define SERV_0_QUEUE_SIZE 5
 
@@ -261,7 +261,12 @@ typedef enum
   /* User-defined events start here */
   ES_NEW_KEY,               /* signals a new key received from terminal */
   ES_LOCK,
-  ES_UNLOCK
+  ES_UNLOCK, 
+  ES_FUEL_QUERY, 
+  ES_BAD_FUEL_QUERY,
+  ES_TRANSMIT_COMPLETE, 
+  ES_UART_RXMSG, 
+  ES_UART_BAD_RXMSG
 }ES_EventType_t;
 
 /****************************************************************************/
@@ -270,7 +275,7 @@ typedef enum
 // services are on that distribution list.
 #define NUM_DIST_LISTS 1
 #if NUM_DIST_LISTS > 0
-#define DIST_LIST0 PostTestHarnessService0, PostTestHarnessService0
+#define DIST_LIST0 PostFuelUART
 #endif
 #if NUM_DIST_LISTS > 1
 #define DIST_LIST1 PostTestHarnessService1, PostTestHarnessService1
@@ -320,7 +325,7 @@ typedef enum
 #define TIMER12_RESP_FUNC TIMER_UNUSED
 #define TIMER13_RESP_FUNC TIMER_UNUSED
 #define TIMER14_RESP_FUNC TIMER_UNUSED
-#define TIMER15_RESP_FUNC PostTestHarnessService0
+#define TIMER15_RESP_FUNC TIMER_UNUSED
 
 /****************************************************************************/
 // Give the timer numbers symbolc names to make it easier to move them
