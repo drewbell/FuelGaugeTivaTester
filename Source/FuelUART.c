@@ -52,6 +52,8 @@
 #define UART_TX_PIN	GPIO_PIN_1	// Defined in AFSEL Table on page 1351
 #define BITS_PER_NIBBLE 4
 #define FUEL_QUERY 0xAA
+#define FUEL_CHECK 0x08         // bit 3 set if tank is fueld
+#define FUEL_LEVEL_MASK 0x07         // bit 3 set if tank is fueld
 
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
@@ -169,8 +171,17 @@ ES_Event_t RunFuelUART(ES_Event_t ThisEvent)
       break;
     
     case ES_UART_RXMSG:
-      printf("\n\rRX from Fuel Gauge: 0x%x", ThisEvent.EventParam);
+    {
+      uint8_t rx_msg = ThisEvent.EventParam;
+      if( ((0xF0 & ~rx_msg) >> 4) == (0x0F & rx_msg)){   // perform error checking per spec
+        if(FUEL_CHECK & rx_msg)
+          printf("\n\rRX from Fuel Gauge. State: FUELED, Level %d/7", rx_msg & FUEL_LEVEL_MASK);
+        else
+          printf("\n\rRX from Fuel Gauge. State: EMPTY");
+      }
+      else printf("\n\rRX from Fuel Gauge: bitwise error check FAILED, data: 0x%x", rx_msg);
       break;    
+    }
     
     case ES_UART_BAD_RXMSG: 
       printf("\n\rUART Error in receiving message from FuelGauge.");
@@ -181,7 +192,7 @@ ES_Event_t RunFuelUART(ES_Event_t ThisEvent)
       break;
     
     case ES_TRANSMIT_COMPLETE:
-      printf("\n\rUART 1 Transmit Complete");
+      //printf("\n\rUART 1 Transmit Complete");
       break; 
    
     default:
@@ -281,8 +292,8 @@ bool InitializeUART (void){
 		// Enable the UART by setting the UARTEN bit in the UARTCTL register
 		HWREG(UART1_BASE + UART_O_CTL) |= (UART_CTL_UARTEN);
     
-    // Enable the UART by setting the UARTEN bit in the UARTCTL register
-		HWREG(UART1_BASE + UART_O_CTL) |= (UART_CTL_LBE);
+    // Enable loop back mode
+		//HWREG(UART1_BASE + UART_O_CTL) |= (UART_CTL_LBE);
 			
 		//Enable nvi
 		HWREG(NVIC_EN0) |= BIT6HI;
@@ -309,7 +320,7 @@ bool InitializeUART (void){
 ===========================================================================*/
 
 void UART_ISR ( void ) {
-  printf("\n\rUART ISR");
+  //printf("\n\rUART ISR");
 
 	// If TXMIS is set we have a transmit interrupt and can now send another byte (Page  930 and 931)
 	if (HWREG(UART1_BASE + UART_O_MIS) & UART_MIS_TXMIS) {
@@ -330,7 +341,7 @@ void UART_ISR ( void ) {
  Notes: 
 ===========================================================================*/
 void TransmitISR ( void ) {
-  printf("\n\rTransmitISR");
+  //printf("\n\rTransmitISR");
   // clear the TX intrerrupt:  Set TXIC in UARTICR to clear tx interrupt (Page 933 & 934)
   HWREG(UART1_BASE + UART_O_ICR) |= UART_ICR_TXIC;
   
@@ -351,7 +362,7 @@ void TransmitISR ( void ) {
  Notes: - This ISR is partially specific to the zigbee protocol as it will skip 
 ===========================================================================*/
 void ReceiveISR(void){
-    printf("\n\rReceiveISR");
+    //printf("\n\rReceiveISR");
 		//Clear the receive interrupt source in the UARTICR (UART Masked Interrupt Clear Register)
 		HWREG(UART1_BASE + UART_O_ICR) |= UART_ICR_RXIC;
 	

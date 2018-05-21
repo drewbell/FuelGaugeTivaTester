@@ -134,7 +134,7 @@ bool Check4Keystroke(void)
       ES_Event_t QueryEvent;
       QueryEvent.EventType = ES_FUEL_QUERY;
       PostFuelUART(QueryEvent);
-      printf("\n\rKeystroke < q > FuelQuery ");
+      //printf("\n\rKeystroke < q > FuelQuery ");
     }
     else if(ThisEvent.EventParam == 'b')
     {
@@ -154,12 +154,7 @@ bool Check4Keystroke(void)
       printf("\n\rUART1 Loopback Mode and RX <Disabled>");
       HWREG(UART1_BASE + UART_O_IM) &= ~UART_IM_RXIM;
       HWREG(UART1_BASE + UART_O_CTL) &= ~UART_CTL_LBE;
-    }
-    
-    
-        // Enable the UART by setting the UARTEN bit in the UARTCTL register
-		HWREG(UART1_BASE + UART_O_CTL) |= (UART_CTL_LBE);
-    
+    }  
 
     return true;
   }
