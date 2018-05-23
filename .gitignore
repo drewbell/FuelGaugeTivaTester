@@ -12,3 +12,4 @@
 
 # these .orig files are a by-product of using KDiff3 to merge
 *.orig
+.DS_Store
